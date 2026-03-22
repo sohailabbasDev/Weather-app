@@ -1,10 +1,13 @@
 package com.sohailabbas.weather_app.domain
 
 import com.sohailabbas.weather_app.data.local.WeatherDao
-import com.sohailabbas.weather_app.data.local.WeatherEntity
 import com.sohailabbas.weather_app.data.remote.api.WeatherApi
+import com.sohailabbas.weather_app.data.remote.dto.DailyWeatherUiModel
+import com.sohailabbas.weather_app.data.remote.dto.toDailyList
+import com.sohailabbas.weather_app.data.remote.dto.toEntities
 import com.sohailabbas.weather_app.data.repositories.WeatherRepository
 import com.sohailabbas.weather_app.util.Constants
+import com.sohailabbas.weather_app.util.Response
 import jakarta.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
@@ -12,31 +15,29 @@ class WeatherRepositoryImpl @Inject constructor(
     private val dao: WeatherDao
 ) : WeatherRepository {
 
-    override suspend fun getForecast(city: String, apiKey : String?): List<WeatherEntity> {
+    override suspend fun getForecast(
+        city: String,
+        apiKey: String?
+    ): Response<List<DailyWeatherUiModel>> {
         return try {
-            //Using this free api key as fallback if unused api key
-            val response = api.getForecast(city = city, apiKey = apiKey ?: Constants.API_KEY)
 
-            val daily = response.list
+            val response = api.getForecast(city, apiKey ?: Constants.API_KEY)
 
-            val entities = daily.map {
-                WeatherEntity(
-                    city = response.city.name,
-                    date = it.dt_txt,
-                    temperature = it.main.temp,
-                    description = it.weather.first().description,
-                    icon = it.weather.first().icon
-                )
-            }
-
+            val entities = response.toEntities()
             dao.deleteCity(city)
             dao.insertAll(entities)
 
-            entities
+            Response.Success(response.toDailyList())
+
         } catch (e: Exception) {
-            // fallback to offline
-            e.printStackTrace()
-            dao.getWeather(city)
+
+            val cached = dao.getWeather(city)
+
+            if (cached.isNotEmpty()) {
+                Response.Success(cached.toDailyList())
+            } else {
+                Response.Error(e.message)
+            }
         }
     }
 }

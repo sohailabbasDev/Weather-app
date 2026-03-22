@@ -1,0 +1,73 @@
+package com.sohailabbas.weather_app.data.remote.dto
+
+import com.sohailabbas.weather_app.data.local.WeatherEntity
+import com.sohailabbas.weather_app.util.HelperFunctions.toTemp
+import com.sohailabbas.weather_app.util.HelperFunctions.toTime
+
+fun ForecastResponse.toEntities(): List<WeatherEntity> {
+    return list.map {
+        WeatherEntity(
+            city = city.name,
+            date = it.dt_txt,
+            temperature = it.main.temp,
+            description = it.weather.first().description,
+            icon = it.weather.first().icon
+        )
+    }
+}
+
+fun ForecastResponse.toDailyList(): List<DailyWeatherUiModel> {
+
+    return list
+        .groupBy { it.dt_txt.substring(0, 10) }
+        .entries
+        .take(3)
+        .map { (date, items) ->
+
+            val first = items.first()
+
+            DailyWeatherUiModel(
+                date = date,
+                description = first.weather.first().description,
+                maxTemp = "${items.maxOf { it.main.temp }.toInt()}°",
+                minTemp = "${items.minOf { it.main.temp }.toInt()}°",
+                icon = first.weather.first().icon,
+
+                hourly = items.map {
+                    DailyWeatherUiModel.HourlyUiModel(
+                        time = it.dt_txt.toTime(),
+                        temp = "${it.main.temp.toInt()}°",
+                        icon = it.weather.first().icon
+                    )
+                }
+            )
+        }
+}
+
+fun List<WeatherEntity>.toDailyList(): List<DailyWeatherUiModel> {
+
+    return groupBy { it.date.substring(0, 10) }
+        .entries
+        .take(3)
+        .map { (date, items) ->
+
+            val first = items.first()
+
+            DailyWeatherUiModel(
+                date = date,
+                description = first.description,
+                maxTemp = "${items.maxOf { it.temperature }.toInt()}°",
+                minTemp = "${items.minOf { it.temperature }.toInt()}°",
+                icon = first.icon,
+
+                hourly = items.map {
+                    DailyWeatherUiModel.HourlyUiModel(
+                        time = it.date.toTime(),
+                        temp = "${it.temperature.toInt()}°",
+                        icon = it.icon
+                    )
+                }
+            )
+        }
+}
+
