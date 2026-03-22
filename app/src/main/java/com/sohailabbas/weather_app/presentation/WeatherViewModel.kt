@@ -31,7 +31,6 @@ class WeatherViewModel @Inject constructor(
 
     fun fetchWeather() {
         val apiKey = BuildConfig.WEATHER_API_KEY
-        Log.d("API_KEY", "fetchWeather: $apiKey")
         viewModelScope.launch {
             _weatherForecastState.value = weatherRepository.getForecast(city, apiKey)
         }
