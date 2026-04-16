@@ -1,6 +1,7 @@
 package com.sohailabbas.weather_app.data.remote.dto
 
 import com.sohailabbas.weather_app.data.local.WeatherEntity
+import com.sohailabbas.weather_app.util.HelperFunctions.toTime
 
 fun ForecastResponse.toEntities(): List<WeatherEntity> {
     return list.map {
