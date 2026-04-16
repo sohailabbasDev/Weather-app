@@ -26,8 +26,7 @@ class WeatherTemperatureToggleTest {
     val composeTestRule = createComposeRule()
 
     private val mockViewModel = mockk<WeatherViewModel>(relaxed = true)
-    
-    // Use mutableStateOf so Compose can observe changes in the mock
+
     private val unitState = mutableStateOf(TemperatureUnit.CELSIUS)
 
     @Before
@@ -53,11 +52,9 @@ class WeatherTemperatureToggleTest {
         
         every { mockViewModel.weatherForecastState } returns weatherState
         every { mockViewModel.city } returns "London"
-        
-        // Reset state for every test
+
         unitState.value = TemperatureUnit.CELSIUS
-        
-        // Mock the property and the toggle function
+
         every { mockViewModel.temperatureUnit } answers { unitState.value }
         every { mockViewModel.toggleTemperatureUnit() } answers {
             unitState.value = if (unitState.value == TemperatureUnit.CELSIUS) {
@@ -72,12 +69,9 @@ class WeatherTemperatureToggleTest {
     fun initialState_DisplaysCelsius() {
         startScreen()
 
-        // Daily Temps
         composeTestRule.onNodeWithText("20°C").assertIsDisplayed()
         composeTestRule.onNodeWithText("10°C").assertIsDisplayed()
-        // Hourly Temp
         composeTestRule.onNodeWithText("15°C").assertIsDisplayed()
-        // Label
         composeTestRule.onNodeWithText("Celsius (°C)").assertIsDisplayed()
     }
 
@@ -85,11 +79,8 @@ class WeatherTemperatureToggleTest {
     fun toggleToFahrenheit_UpdatesDailyTemperatures() {
         startScreen()
 
-        // Toggle to Fahrenheit
         composeTestRule.onNodeWithTag("unit_toggle_row").performClick()
 
-        // 20°C -> 68°F
-        // 10°C -> 50°F
         composeTestRule.onNodeWithText("68°F").assertIsDisplayed()
         composeTestRule.onNodeWithText("50°F").assertIsDisplayed()
         composeTestRule.onNodeWithText("Fahrenheit (°F)").assertIsDisplayed()
@@ -99,10 +90,8 @@ class WeatherTemperatureToggleTest {
     fun toggleToFahrenheit_UpdatesHourlyTemperatures() {
         startScreen()
 
-        // Toggle to Fahrenheit
         composeTestRule.onNodeWithTag("unit_toggle_row").performClick()
 
-        // 15°C -> 59°F
         composeTestRule.onNodeWithText("59°F").assertIsDisplayed()
     }
 
@@ -110,7 +99,6 @@ class WeatherTemperatureToggleTest {
     fun toggleBackToCelsius_RestoresOriginalValues() {
         startScreen()
 
-        // Toggle to Fahrenheit then back to Celsius
         composeTestRule.onNodeWithTag("unit_toggle_row").performClick()
         composeTestRule.onNodeWithTag("unit_toggle_row").performClick()
 
