@@ -9,6 +9,7 @@ import com.sohailabbas.weather_app.BuildConfig
 import com.sohailabbas.weather_app.data.remote.dto.DailyWeatherUiModel
 import com.sohailabbas.weather_app.data.repositories.WeatherRepository
 import com.sohailabbas.weather_app.util.Response
+import com.sohailabbas.weather_app.util.TemperatureUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,9 @@ class WeatherViewModel @Inject constructor(
     val weatherForecastState = _weatherForecastState.asStateFlow()
 
     var city by mutableStateOf("Bengaluru")
+    
+    var temperatureUnit by mutableStateOf(TemperatureUnit.CELSIUS)
+        private set
 
     init {
         // Loading "Bengaluru" forecast by default
@@ -36,6 +40,14 @@ class WeatherViewModel @Inject constructor(
         _weatherForecastState.value = Response.Loading
         viewModelScope.launch {
             _weatherForecastState.value = weatherRepository.getForecast(city, apiKey)
+        }
+    }
+
+    fun toggleTemperatureUnit() {
+        temperatureUnit = if (temperatureUnit == TemperatureUnit.CELSIUS) {
+            TemperatureUnit.FAHRENHEIT
+        } else {
+            TemperatureUnit.CELSIUS
         }
     }
 }

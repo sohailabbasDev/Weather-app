@@ -18,9 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sohailabbas.weather_app.data.remote.dto.DailyWeatherUiModel
+import com.sohailabbas.weather_app.util.TemperatureUnit
+import com.sohailabbas.weather_app.util.formatTemperature
 
 @Composable
-fun HourItem(item: DailyWeatherUiModel.HourlyUiModel) {
+fun HourItem(
+    item: DailyWeatherUiModel.HourlyUiModel,
+    unit: TemperatureUnit
+) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.size(width = 80.dp, height = 100.dp),
@@ -47,7 +52,7 @@ fun HourItem(item: DailyWeatherUiModel.HourlyUiModel) {
             )
 
             Text(
-                text = item.temp,
+                text = item.temp.formatTemperature(unit),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

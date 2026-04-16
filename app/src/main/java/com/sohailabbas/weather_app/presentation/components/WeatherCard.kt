@@ -23,9 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sohailabbas.weather_app.data.remote.dto.DailyWeatherUiModel
+import com.sohailabbas.weather_app.util.TemperatureUnit
+import com.sohailabbas.weather_app.util.formatTemperature
 
 @Composable
-fun WeatherCard(item: DailyWeatherUiModel) {
+fun WeatherCard(
+    item: DailyWeatherUiModel,
+    unit: TemperatureUnit
+) {
 
     Card(
         modifier = Modifier
@@ -65,11 +70,11 @@ fun WeatherCard(item: DailyWeatherUiModel) {
 
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = item.maxTemp,
+                            text = item.maxTemp.formatTemperature(unit),
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = item.minTemp,
+                            text = item.minTemp.formatTemperature(unit),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -84,7 +89,7 @@ fun WeatherCard(item: DailyWeatherUiModel) {
                 contentPadding = PaddingValues(horizontal = 4.dp)
             ) {
                 items(item.hourly) { hour ->
-                    HourItem(hour)
+                    HourItem(hour, unit)
                 }
             }
         }
