@@ -1,7 +1,6 @@
 package com.sohailabbas.weather_app.data.remote.dto
 
 import com.sohailabbas.weather_app.data.local.WeatherEntity
-import com.sohailabbas.weather_app.util.HelperFunctions.toTemp
 import com.sohailabbas.weather_app.util.HelperFunctions.toTime
 
 fun ForecastResponse.toEntities(): List<WeatherEntity> {
@@ -29,14 +28,14 @@ fun ForecastResponse.toDailyList(): List<DailyWeatherUiModel> {
             DailyWeatherUiModel(
                 date = date,
                 description = first.weather.first().description,
-                maxTemp = "${items.maxOf { it.main.temp }.toInt()}°",
-                minTemp = "${items.minOf { it.main.temp }.toInt()}°",
+                maxTemp = items.maxOf { it.main.temp },
+                minTemp = items.minOf { it.main.temp },
                 icon = first.weather.first().icon,
 
                 hourly = items.map {
                     DailyWeatherUiModel.HourlyUiModel(
                         time = it.dt_txt.toTime(),
-                        temp = "${it.main.temp.toInt()}°",
+                        temp = it.main.temp,
                         icon = it.weather.first().icon
                     )
                 }
@@ -56,14 +55,14 @@ fun List<WeatherEntity>.toDailyList(): List<DailyWeatherUiModel> {
             DailyWeatherUiModel(
                 date = date,
                 description = first.description,
-                maxTemp = "${items.maxOf { it.temperature }.toInt()}°",
-                minTemp = "${items.minOf { it.temperature }.toInt()}°",
+                maxTemp = items.maxOf { it.temperature },
+                minTemp = items.minOf { it.temperature },
                 icon = first.icon,
 
                 hourly = items.map {
                     DailyWeatherUiModel.HourlyUiModel(
                         time = it.date.toTime(),
-                        temp = "${it.temperature.toInt()}°",
+                        temp = it.temperature,
                         icon = it.icon
                     )
                 }
